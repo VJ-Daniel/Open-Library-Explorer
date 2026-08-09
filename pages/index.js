@@ -1,72 +1,113 @@
 /*********************************************************************************
- *  WEB422 – Assignment 1
+ *  WEB422 – Assignment 3
  *
  *  I declare that this assignment is my own work in accordance with Seneca's
  *  Academic Integrity Policy:
  *
  *  https://www.senecapolytechnic.ca/about/policies/academic-integrity-policy.html
  *
- *  Name: VJ Daniel Uy Student ID: 106680242 Date: June 07, 2026
+ *  Name: VJ Daniel Uy Student ID: 106680242 Date: ________________
+ *
+ *  Vercel App (Deployed) Link: _____________________________________________________
  *
  ********************************************************************************/
 
-import useSWR from "swr";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Pagination, Table } from "react-bootstrap";
+import { useForm } from "react-hook-form";
 import PageHeader from "@/components/PageHeader";
 
 export default function Home() {
-  const [page, setPage] = useState(1);
   const router = useRouter();
-  const author = "Jay Asher";
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
-  const { data, error } = useSWR(
-    `https://openlibrary.org/search.json?q=author:${encodeURIComponent(author)}&page=${page}&limit=10&fields=key,title,first_publish_year`,
-    { keepPreviousData: true },
-  );
-
-  function previous() {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }
-
-  function next() {
-    setPage(page + 1);
-  }
+  const onSubmit = (data) => {
+    router.push({
+      pathname: "/books",
+      query: Object.fromEntries(
+        Object.entries(data).filter(([, value]) => value !== ""),
+      ),
+    });
+  };
 
   return (
     <>
-      <PageHeader text={`Novels by ${author}`} />
-      <Table striped hover>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>First Published</th>
-          </tr>
-        </thead>
+      <PageHeader
+        text="Find your next great read"
+        subtext="Search our collection of books and explore author details, genres, and more."
+      />
 
-        <tbody>
-          {data?.docs?.map((book) => (
-            <tr
-              key={book}
-              onClick={() => router.push(book.key)}
-              style={{ cursor: "pointer" }}
-            >
-              <td>{book.title}</td>
-              <td>{book.first_publish_year || "N/A"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-      <Pagination>
-        <Pagination.Prev onClick={previous} />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="mb-3">
+          <label htmlFor="author" className="form-label">
+            Author<span className="text-danger">*</span>
+          </label>
+          <input
+            id="author"
+            type="text"
+            className={`form-control ${errors.author ? "is-invalid" : ""}`}
+            {...register("author", { required: "Author is required" })}
+          />
+          {errors.author ? (
+            <div className="invalid-feedback">{errors.author.message}</div>
+          ) : null}
+        </div>
 
-        <Pagination.Item>{page}</Pagination.Item>
+        <div className="mb-3">
+          <label htmlFor="title" className="form-label">
+            Title
+          </label>
+          <input
+            id="title"
+            type="text"
+            className="form-control"
+            {...register("title")}
+          />
+        </div>
 
-        <Pagination.Next onClick={next} />
-      </Pagination>
+        <div className="mb-3">
+          <label htmlFor="subject" className="form-label">
+            Subject
+          </label>
+          <input
+            id="subject"
+            type="text"
+            className="form-control"
+            {...register("subject")}
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="language" className="form-label">
+            Language
+          </label>
+          <input
+            id="language"
+            type="text"
+            className="form-control"
+            {...register("language")}
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="first_publish_year" className="form-label">
+            First Publish Year
+          </label>
+          <input
+            id="first_publish_year"
+            type="text"
+            className="form-control"
+            {...register("first_publish_year")}
+          />
+        </div>
+
+        <button type="submit" className="btn btn-primary">
+          Search
+        </button>
+      </form>
     </>
   );
 }

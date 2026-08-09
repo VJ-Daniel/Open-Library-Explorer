@@ -15,7 +15,7 @@ export async function getStaticProps() {
   };
 }
 
-export default function About(props) {
+export default function About({book}) {
   return (
     <>
       <PageHeader text="About the Developer - VJ Daniel" />
@@ -32,7 +32,7 @@ export default function About(props) {
         retrieved using the Open Library API.
       </p>
 
-      <BookDetails book={props.book} />
+      <BookDetails book={book} workId="OL9264548W" showFavouriteBtn={false} />
     </>
   );
 }

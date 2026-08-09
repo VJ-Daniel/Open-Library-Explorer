@@ -1,8 +1,31 @@
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { useState, useEffect } from "react";
+import { useAtom } from "jotai";
+import { favouritesAtom } from "@/store";
+import { addToFavourites, removeFromFavourites } from "@/lib/userData";
+import Button from "react-bootstrap/Button";
 
-export default function BookDetails({ book }) {
+export default function BookDetails({ book, workId, showFavouriteBtn = true }) {
+
+  const [favouritesList, setFavouritesList] = useAtom(favouritesAtom);
+
+  const [showAdded, setShowAdded] = useState(false);
+
+  useEffect(() => {
+    setShowAdded(favouritesList?.includes(workId));
+  }, [favouritesList, workId]);
+
+  async function favouritesClicked() {
+    if (showAdded) {
+      setFavouritesList(await removeFromFavourites(workId));
+    }
+    else {
+      setFavouritesList(await addToFavourites(workId));
+    }
+   }
+
   return (
     <Container>
       <Row>
@@ -56,6 +79,16 @@ export default function BookDetails({ book }) {
               <br />
             </span>
           ))}
+
+          {showFavouriteBtn && (
+            <Button
+              className="mt-3"
+              variant={showAdded ? "primary" : "outline-primary"}
+              onClick={favouritesClicked}
+            >
+              {showAdded ? "+ Favourite (added)" : "+ Favourite"}
+            </Button>
+          )}
         </Col>
       </Row>
     </Container>

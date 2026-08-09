@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Layout from "@/components/Layout";
+import RouteGuard from "@/components/RouteGuard";
 import { SWRConfig } from "swr";
 
 const fetcher = async (...args) => {
@@ -17,9 +18,11 @@ const fetcher = async (...args) => {
 export default function App({ Component, pageProps }) {
   return (
     <SWRConfig value={{ fetcher }}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <RouteGuard>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </RouteGuard>
     </SWRConfig>
   );
 }
